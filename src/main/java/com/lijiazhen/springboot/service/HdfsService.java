@@ -7,10 +7,10 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,24 +19,6 @@ import java.util.List;
 public class HdfsService {
 
     private String hdfsPath = "hdfs://192.168.174.137:9000/es/";
-
-//    public static void main(String[] args) throws IOException {
-//        HdfsService hd = new HdfsService();
-////        hd.copyFile("E:/friends2.txt");
-//
-////        hd.deleteFromHdfs(hd.hdfsPath+"friends2.txt");
-////        hd.createdir("testfiles.txt");
-////
-//        InputStream ism = hd.getFileInputStreamForPath("hdfs://192.168.174.137:9000/es/friends.txt");
-//        int len = 0;
-//        byte[] buf = new byte[1024];
-//        FileOutputStream fos = new FileOutputStream("E:/friends.txt");
-//
-//        while((len=ism.read(buf))!=-1){
-//            fos.write(buf,0,len);
-//        }
-//        fos.close();
-//    }
 
     /**
      * 上传文件
@@ -136,17 +118,17 @@ public class HdfsService {
 
     /**
      * 获取文件输入流
-     * @param strpath 文件的hdfs绝对路径
+     * @param filepath 文件的hdfs绝对路径
      * @return
      * @throws IOException
      */
-    public InputStream getFileInputStreamForPath(String strpath) throws IOException{
+    public InputStream download(String filepath) throws IOException{
+        filepath=hdfsPath+filepath;
         //指定当前的Hadoop的用户
         System.setProperty("HADOOP_USER_NAME", "root");
         Configuration conf = new Configuration();
-        conf.set("fs.default.name", strpath);
-        FileSystem fs = FileSystem.get(conf);
-        return fs.open(new Path(strpath));
+        FileSystem fs = FileSystem.get(URI.create(filepath),conf);
+        return fs.open(new Path(filepath));
     }
 
 
@@ -174,32 +156,23 @@ public class HdfsService {
         return  list;
     }
 
-    /**遍历HDFS上的文件和目录*/
-    public FileStatus[] getDirectoryFromHdfs(String path) {
+    public void rename(String name1,String name2){//重命名
 
-        //指定当前的Hadoop的用户
-        System.setProperty("HADOOP_USER_NAME", "root");
-        Configuration conf = new Configuration();
-        String dst = hdfsPath;
-        FileStatus[] list=null;
+        System.setProperty("HADOOP_USER_NAME","root");
+        Configuration configuration=new Configuration();
+        name1=hdfsPath+name1;//原名路径
+        name2=hdfsPath+name2;//改名之后的路径
+        FileSystem fileSystem= null;
+        Path pathold=new Path(name1);
+        Path pathnew=new Path(name2);
         try {
-
-            if (path.length() > 0) {
-                dst = path;
-            }
-            FileSystem fs = FileSystem.get(URI.create(dst), conf);
-            list = fs.listStatus(new Path(dst));
-            if (list != null)
-                for (FileStatus f : list) {
-                    System.out.printf("name: %s, folder: %s, size: %d\n", f.getPath().getName(), f.isDir(), f.getLen());
-
-                }
-            fs.close();
-
-        } catch (Exception ex) {
-
+            fileSystem=FileSystem.get(URI.create(name1),configuration);
+            fileSystem.rename(pathold,pathnew);
+            System.out.println(name1+"文件改名后为"+name2);
+            fileSystem.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return list;
     }
 
 }

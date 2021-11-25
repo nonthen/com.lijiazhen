@@ -21,10 +21,16 @@
         <td th:text="${hf.len}"></td>
         <td>
             <a th:href="@{del(name=${hf.name})}">删除</a>
-            <a th:href="addForm">添加</a>
+            <a th:href="@{download(name=${hf.name})}">下载</a>
+            <form th:action="@{rename(name1=${hf.name},name2=${name})}" method="post">
+                重命名：<input type="text" th:name="name2">
+                <input type="submit">
+            </form>
         </td>
     </tr>
 </table>
+
+<h2><a th:href="addForm">上传</a></h2>
 
 </body>
 </html>

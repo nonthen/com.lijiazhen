@@ -29,7 +29,7 @@ public class HdfsController {
     public String lists(ModelMap map){
         List<HdfsFile> lists= hdfsService.getDirectoryFromHdfs();
         map.put("lists",lists);
-        return "lists";
+        return "fuc/lists";
     }
 
     @RequestMapping("/del")
@@ -42,7 +42,7 @@ public class HdfsController {
 
     @RequestMapping("/addForm")
     public String addForm(){
-        return "add";
+        return "fuc/add";
     }
 
     @RequestMapping(value = "/addFile",method= RequestMethod.POST)

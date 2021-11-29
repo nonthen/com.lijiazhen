@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class HdfsService {
 
-    private String hdfsPath = "hdfs://192.168.174.138:9000/es/";
+    private String hdfsPath = "hdfs://192.168.174.139:9000/es/";
 
     /**
      * 上传文件

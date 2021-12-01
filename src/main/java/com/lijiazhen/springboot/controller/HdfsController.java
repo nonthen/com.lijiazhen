@@ -2,6 +2,7 @@ package com.lijiazhen.springboot.controller;
 
 import com.lijiazhen.springboot.service.HdfsService;
 import com.lijiazhen.springboot.vo.HdfsFile;
+import com.lijiazhen.springboot.vo.User;
 import org.apache.hadoop.fs.FileStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,10 +27,19 @@ public class HdfsController {
     private HdfsService hdfsService;
 
     @RequestMapping("/lists")
-    public String lists(ModelMap map){
-        List<HdfsFile> lists= hdfsService.getDirectoryFromHdfs();
-        map.put("lists",lists);
-        return "fuc/lists";
+    public String lists(ModelMap map,HttpSession session){
+        Object obj=session.getAttribute("user_login");
+        User user=null;
+        if (obj!=null) {
+            user = (User) obj;
+            List<HdfsFile> lists = hdfsService.getDirectoryFromHdfs();
+            map.put("lists", lists);
+        }
+//            return "fuc/lists";
+//        }else {
+//            return "redirect:/loginPage";
+//        }
+            return "fuc/lists";
     }
 
     @RequestMapping("/del")
